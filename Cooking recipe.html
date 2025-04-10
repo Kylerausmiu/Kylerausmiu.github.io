@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Cooking Recipes</title>
+    <style>
+        :root {
+            --mint-bg: #D4F4DD;
+            --sage-green: #A9C7A8;
+            --olive-green: #6B8E23;
+            --off-white: rgba(248, 249, 245, 0.9);
+            --text-color: #333;
+        }
+
+        body {
+            background-color: var(--mint-bg);
+            background-image: url('img/bg.avif');
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: url('https://via.placeholder.com/1500x300?text=Cooking+Scene') no-repeat center;
+            background-size: cover;
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            border-radius: 10px;
+        }
+
+        h1 { margin: 0; font-size: 2.5em; }
+        h2 { color: var(--olive-green); font-size: 1.8em; margin-bottom: 15px; }
+        h3 { color: var(--olive-green); margin: 0 0 10px; }
+
+        .tabs {
+            text-align: center;
+            margin: 20px 0;
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+            background: var(--mint-bg);
+            padding: 10px 0;
+            border-radius: 5px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background-color: var(--sage-green);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .tab-button:hover {
+            background-color: #8BAF8A;
+            transform: scale(1.05);
+        }
+
+        .tab-button.active {
+            background-color: var(--olive-green);
+            color: white;
+        }
+
+        .search-bar {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #search-input {
+            padding: 12px;
+            width: 50%;
+            max-width: 400px;
+            border: 1px solid var(--sage-green);
+            border-radius: 20px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s;
+        }
+
+        #search-input:focus {
+            border-color: var(--olive-green);
+            outline: none;
+        }
+
+        .recipe-section, .about-section {
+            display: none;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .recipe-section {
+            background-color: var(--off-white);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .about-section {
+            background-color: var(--sage-green);
+            text-align: center;
+        }
+
+        .recipe-section.active, .about-section.active {
+            display: block;
+        }
+
+        .recipe {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .recipe.hidden {
+            display: none;
+        }
+
+        .recipe img {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 20px;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+
+        .recipe:hover img {
+            transform: scale(1.1);
+        }
+
+        .recipe-content ul {
+            margin: 5px 0 10px;
+            padding-left: 20px;
+        }
+
+        .recipe-content p {
+            margin: 5px 0;
+        }
+
+        .tags {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .tags span {
+            background: var(--sage-green);
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-right: 5px;
+        }
+
+        .serving-adjuster {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .serving-adjuster button {
+            background: var(--olive-green);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .serving-adjuster button:hover {
+            background: #5A7A1D;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .favorite-btn.favorited {
+            color: #e74c3c;
+        }
+
+        .instruction-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .instruction-list input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        a {
+            color: var(--olive-green);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background-color: var(--olive-green);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #back-to-top:hover {
+            background-color: #5A7A1D;
+        }
+
+        @media (max-width: 768px) {
+            .recipe {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .recipe img {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 0 15px;
+            }
+
+            .tabs {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tab-button {
+                margin: 5px;
+            }
+
+            #search-input {
+                width: 80%;
+            }
+        }
+/* Dark Mode Toggle Button */
+#dark-mode-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--sage-green);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#dark-mode-toggle:hover {
+    background-color: #8BAF8A;
+    transform: scale(1.1);
+}
+
+/* Dark Mode Theme */
+body.dark-mode {
+    --mint-bg: #1a2b2a;
+    --sage-green: #3a5a57;
+    --olive-green: #8ba088;
+    --off-white: rgba(40, 50, 48, 0.9);
+    --text-color: #e0e0e0;
+    background-color: var(--mint-bg);
+    color: var(--text-color);
+}
+
+body.dark-mode header {
+    text-shadow: 2px 2px 4px #333;
+}
+
+body.dark-mode .tabs {
+    background: var(--mint-bg);
+}
+
+body.dark-mode .tab-button {
+    background-color: var(--sage-green);
+}
+
+body.dark-mode .tab-button:hover {
+    background-color: #5a7a77;
+}
+
+body.dark-mode .tab-button.active {
+    background-color: var(--olive-green);
+}
+
+body.dark-mode .recipe-section {
+    background-color: var(--off-white);
+}
+
+body.dark-mode .about-section {
+    background-color: var(--sage-green);
+}
+
+body.dark-mode .recipe {
+    background: #2a3b39;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #search-input {
+    background: #3a4a48;
+    border-color: var(--sage-green);
+    color: var(--text-color);
+}
+
+body.dark-mode #back-to-top {
+    background-color: var(--olive-green);
+}
+
+body.dark-mode #back-to-top:hover {
+    background-color: #6b8a67;
+}
+
+body.dark-mode .favorite-btn.favorited {
+    color: #ff6b6b;
+}
+
+.nutrition-info {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.nutrition-info span {
+    font-weight: bold;
+}
+        .comments-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--sage-green);
+        }
+
+        .comments-section h4 {
+            color: var(--olive-green);
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .comments-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .comment {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .comment {
+            background: rgba(50, 60, 58, 0.8);
+            color: var(--text-color);
+        }
+
+        .comment p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+
+        .comment .timestamp {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        body.dark-mode .comment .timestamp {
+            color: #aaa;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .comment-form textarea {
+            padding: 10px;
+            border: 1px solid var(--sage-green);
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: Arial, sans-serif;
+        }
+
+        body.dark-mode .comment-form textarea {
+            background: #3a4a48;
+            border-color: var(--sage-green);
+            color: var(--text-color);
+        }
+
+        .comment-form button {
+            background: var(--olive-green);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+
+        .comment-form button:hover {
+            background: #5A7A1D;
+        }
+   
+          </style>
+</head>
+<body>
+    <header>
+        <h1>Easy Cooking Recipes</h1>
+        <p>Simple and Delicious Meals for Everyone</p>
+        <button id="dark-mode-toggle" aria-label="Toggle dark mode">🌙</button>
+    </header>
+
+    <div class="tabs" role="tablist">
+        <button class="tab-button active" onclick="showTab('savoury')" role="tab" aria-selected="true" aria-controls="savoury">Savoury</button>
+        <button class="tab-button" onclick="showTab('sweets')" role="tab" aria-selected="false" aria-controls="sweets">Sweets</button>
+        <button class="tab-button" onclick="showTab('favorites')" role="tab" aria-selected="false" aria-controls="favorites">Favorites</button>
+        <button class="tab-button" onclick="showTab('about')" role="tab" aria-selected="false" aria-controls="about">About Us</button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search recipes (e.g., chicken, quick)..." oninput="searchRecipes()">
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Savoury Recipes -->
+    <section id="savoury" class="recipe-section active" role="tabpanel">
+        <h2>Savoury Recipes</h2>
+        <div class="recipe" data-id="kofte" data-tags="meat, turkish">
+    <img src="img/K.jpg" alt="Köfte">
+    <div class="recipe-content">
+        <h3>Köfte (Turkish Meatballs)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "ground beef or lamb": {"calories": 800},
+            "onion": {"calories": 40},
+            "breadcrumbs": {"calories": 200},
+            "egg": {"calories": 70},
+            "cumin": {"calories": 8},
+            "paprika": {"calories": 6},
+            "parsley": {"calories": 4}
+        }'>
+            <li data-amount="1">1 lb ground beef or lamb</li>
+            <li data-amount="1">1 onion (grated)</li>
+            <li data-amount="0.5">1/2 cup breadcrumbs</li>
+            <li data-amount="1">1 egg</li>
+            <li data-amount="1">1 tsp cumin</li>
+            <li data-amount="1">1 tsp paprika</li>
+            <li>Salt</li>
+            <li>Pepper</li>
+            <li data-amount="2">2 tbsp parsley (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('kofte', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('kofte', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">282</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 30 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Meat</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">In a large bowl, mix ground meat, grated onion, breadcrumbs, egg, cumin, paprika, salt, pepper, and parsley until well combined.</li>
+            <li><input type="checkbox">Shape the mixture into small patties or elongated meatballs.</li>
+            <li><input type="checkbox">Heat a skillet over medium heat with a little oil.</li>
+            <li><input type="checkbox">Cook köfte for 4-5 minutes per side until browned and cooked through.</li>
+            <li><input type="checkbox">Serve hot with rice or flatbread.</li>
+        </ul>
+        <p><strong>Tips:</strong> Pair with yogurt sauce or a tomato salad for extra flavor.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="kofte"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'kofte')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('kofte')">♥</button>
+</div>
+       <div class="recipe" data-id="imam-bayildi" data-tags="vegetarian">
+    <img src="img/Ib.jpg" alt="Imam Bayildi">
+    <div class="recipe-content">
+        <h3>Imam Bayildi (Stuffed Eggplant)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "eggplants": {"calories": 160},
+            "onions": {"calories": 80},
+            "tomatoes": {"calories": 90},
+            "green peppers": {"calories": 40},
+            "garlic": {"calories": 20},
+            "olive oil": {"calories": 480},
+            "parsley": {"calories": 2}
+        }'>
+            <li data-amount="2">2 medium eggplants</li>
+            <li data-amount="2">2 onions (sliced)</li>
+            <li data-amount="3">3 tomatoes (chopped)</li>
+            <li data-amount="2">2 green peppers (sliced)</li>
+            <li data-amount="4">4 garlic cloves (minced)</li>
+            <li data-amount="0.25">1/4 cup olive oil</li>
+            <li>Salt</li>
+            <li>Pepper</li>
+            <li data-amount="1">1 tbsp parsley (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('imam-bayildi', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('imam-bayildi', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">218</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 1 hour</p>
+        <p><strong>Difficulty:</strong> Unholy amount of hardness</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Cut eggplants in half lengthwise, scoop out some flesh, and sprinkle with salt; let sit for 20 minutes, then rinse.</li>
+            <li><input type="checkbox">Heat half the olive oil in a skillet, fry eggplants until lightly browned, then set aside.</li>
+            <li><input type="checkbox">In the same skillet, sauté onions, peppers, and garlic until soft, about 10 minutes.</li>
+            <li><input type="checkbox">Add tomatoes, salt, and pepper; cook until thickened, about 10 minutes.</li>
+            <li><input type="checkbox">Stuff eggplants with the mixture, place in a baking dish, drizzle with remaining oil, and bake at 375°F (190°C) for 30 minutes.</li>
+            <li><input type="checkbox">Garnish with parsley and serve warm or at room temperature.</li>
+        </ul>
+        <p><strong>Tips:</strong> Best enjoyed as a cold appetizer the next day.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="imam-bayildi"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'imam-bayildi')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('imam-bayildi')">♥</button>
+</div>
+<div class="recipe" data-id="lahmacun" data-tags="meat, quick, turkish">
+    <img src="img/L.jpg" alt="Lahmacun">
+    <div class="recipe-content">
+        <h3>Lahmacun (Turkish Pizza)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "ground lamb or beef": {"calories": 800},
+            "onion": {"calories": 40},
+            "tomatoes": {"calories": 60},
+            "tomato paste": {"calories": 30},
+            "red pepper flakes": {"calories": 6},
+            "flatbreads": {"calories": 600},
+            "parsley": {"calories": 2}
+        }'>
+            <li data-amount="1">1 lb ground lamb or beef</li>
+            <li data-amount="1">1 onion (finely chopped)</li>
+            <li data-amount="2">2 tomatoes (finely chopped)</li>
+            <li data-amount="1">1 tbsp tomato paste</li>
+            <li data-amount="1">1 tsp red pepper flakes</li>
+            <li>Salt</li>
+            <li data-amount="4">4 flatbreads or pizza dough rounds</li>
+            <li data-amount="1">1 tbsp parsley (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('lahmacun', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('lahmacun', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">362</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 30 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Meat</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 450°F (230°C).</li>
+            <li><input type="checkbox">Mix ground meat, onion, tomatoes, tomato paste, red pepper flakes, and salt in a bowl.</li>
+            <li><input type="checkbox">Spread the mixture thinly over each flatbread.</li>
+            <li><input type="checkbox">Bake for 10-12 minutes until edges are crispy.</li>
+            <li><input type="checkbox">Sprinkle with parsley and serve with lemon wedges.</li>
+        </ul>
+        <p><strong>Tips:</strong> Add a squeeze of lemon and fresh greens like arugula before eating.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="lahmacun"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'lahmacun')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('lahmacun')">♥</button>
+</div>
+
+<div class="recipe" data-id="menemen" data-tags="vegetarian, quick">
+    <img src="img/M.jpg" alt="Menemen">
+    <div class="recipe-content">
+        <h3>Menemen (Turkish Scrambled Eggs)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="2" data-nutrition='{
+            "eggs": {"calories": 280},
+            "tomatoes": {"calories": 60},
+            "green bell pepper": {"calories": 20},
+            "onion": {"calories": 40},
+            "olive oil": {"calories": 240},
+            "red pepper flakes": {"calories": 6}
+        }'>
+            <li data-amount="4">4 eggs</li>
+            <li data-amount="2">2 tomatoes (diced)</li>
+            <li data-amount="1">1 green bell pepper (chopped)</li>
+            <li data-amount="1">1 onion (finely chopped)</li>
+            <li data-amount="2">2 tbsp olive oil</li>
+            <li>Salt</li>
+            <li>Pepper</li>
+            <li data-amount="1">1 tsp red pepper flakes (optional)</(li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('menemen', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">2</span></p>
+            <button onclick="adjustServings('menemen', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">323</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 20 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat olive oil in a skillet over medium heat.</li>
+            <li><input type="checkbox">Sauté onion and bell pepper until soft, about 5 minutes.</li>
+            <li><input type="checkbox">Add tomatoes and cook until they release juice, about 5 minutes.</li>
+            <li><input type="checkbox">Crack eggs into the skillet, season with salt, pepper, and red pepper flakes, and stir gently until just set.</li>
+            <li><input type="checkbox">Serve hot with crusty bread.</li>
+        </ul>
+        <p><strong>Tips:</strong> Adjust spice level with more or less red pepper flakes.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="menemen"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'menemen')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('menemen')">♥</button>
+</div>
+       <div class="recipe" data-id="chicken-karahi" data-tags="meat, spicy">
+    <img src="img/Ck.jpg" alt="Chicken Karahi">
+    <div class="recipe-content">
+        <h3>Chicken Karahi</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "chicken": {"calories": 960},
+            "tomatoes": {"calories": 90},
+            "onion": {"calories": 40},
+            "ginger-garlic paste": {"calories": 40},
+            "oil": {"calories": 480},
+            "red chili powder": {"calories": 6},
+            "cumin seeds": {"calories": 8},
+            "green chilies": {"calories": 10},
+            "cilantro": {"calories": 1}
+        }'>
+            <li data-amount="2">2 lbs chicken (cut into pieces)</li>
+            <li data-amount="3">3 tomatoes (chopped)</li>
+            <li data-amount="1">1 onion (sliced)</li>
+            <li data-amount="2">2 tbsp ginger-garlic paste</li>
+            <li data-amount="0.25">1/4 cup oil</li>
+            <li data-amount="1">1 tsp red chili powder</li>
+            <li data-amount="1">1 tsp cumin seeds</li>
+            <li>Salt</li>
+            <li data-amount="2">2 green chilies (sliced)</li>
+            <li data-amount="1">1 tbsp cilantro (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('chicken-karahi', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('chicken-karahi', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">409</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 40 minutes</p>
+        <p><strong>Difficulty:</strong> Medium</p>
+        <p class="tags"><strong>Tags:</strong> <span>Meat</span><span>Spicy</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat oil in a wok or karahi over medium heat, add cumin seeds, and let them sizzle.</li>
+            <li><input type="checkbox">Add sliced onion and cook until golden brown, about 5 minutes.</li>
+            <li><input type="checkbox">Stir in ginger-garlic paste and cook for 1 minute until fragrant.</li>
+            <li><input type="checkbox">Add chicken pieces, red chili powder, and salt; cook until chicken is browned, about 10 minutes.</li>
+            <li><input type="checkbox">Mix in chopped tomatoes, cover, and simmer for 15-20 minutes until chicken is tender and oil separates.</li>
+            <li><input type="checkbox">Uncover, add green chilies and cilantro, and cook for 5 more minutes on high heat to thicken the sauce.</li>
+            <li><input type="checkbox">Serve hot with naan or rice.</li>
+        </ul>
+        <p><strong>Tips:</strong> Adjust chili powder to taste for less or more heat.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="chicken-karahi"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'chicken-karahi')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('chicken-karahi')">♥</button>
+</div>
+<div class="recipe" data-id="garlic-butter-chicken" data-tags="chicken, quick">
+    <img src="img/OIP.jpg" alt="Garlic Butter Chicken">
+    <div class="recipe-content">
+        <h3>Garlic Butter Chicken</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "chicken breasts": {"calories": 880},
+            "butter": {"calories": 400},
+            "garlic": {"calories": 15},
+            "parsley": {"calories": 1}
+        }'>
+            <li data-amount="4">4 chicken breasts</li>
+            <li data-amount="4">4 tbsp butter</li>
+            <li data-amount="3">3 garlic cloves (minced)</li>
+            <li>Salt</li>
+            <li>Pepper</li>
+            <li data-amount="1">1 tbsp chopped parsley</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('garlic-butter-chicken', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('garlic-butter-chicken', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">324</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 25 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Chicken</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Pat chicken breasts dry with paper towels and season both sides generously with salt and pepper.</li>
+            <li><input type="checkbox">Heat a large skillet over medium heat and melt 2 tbsp of butter.</li>
+            <li><input type="checkbox">Add minced garlic and sauté for 30 seconds until fragrant.</li>
+            <li><input type="checkbox">Place chicken breasts in the skillet and cook for 6-8 minutes per side, or until golden brown and internal temperature reaches 165°F.</li>
+            <li><input type="checkbox">Add remaining 2 tbsp butter, letting it melt and coat the chicken.</li>
+            <li><input type="checkbox">Remove from heat, sprinkle with parsley, and serve hot.</li>
+        </ul>
+        <p><strong>Tips:</strong> Serve with mashed potatoes or a side salad for a complete meal.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="garlic-butter-chicken"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'garlic-butter-chicken')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('garlic-butter-chicken')">♥</button>
+</div>       
+<div class="recipe" data-id="spaghetti-aglio-e-olio" data-tags="vegetarian, quick">
+    <img src="img/SpagetiAeo.jpg" alt="Spaghetti Aglio e Olio">
+    <div class="recipe-content">
+        <h3>Spaghetti Aglio e Olio</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "spaghetti": {"calories": 720},
+            "olive oil": {"calories": 640},
+            "garlic": {"calories": 20},
+            "red pepper flakes": {"calories": 6},
+            "parsley": {"calories": 4}
+        }'>
+            <li data-amount="12">12 oz spaghetti</li>
+            <li data-amount="0.33">1/3 cup olive oil</li>
+            <li data-amount="4">4 garlic cloves (sliced)</li>
+            <li data-amount="1">1 tsp red pepper flakes</li>
+            <li>Salt</li>
+            <li data-amount="2">2 tbsp parsley (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('spaghetti-aglio-e-olio', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('spaghetti-aglio-e-olio', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">348</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 20 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Boil spaghetti in salted water according to package instructions until al dente, then drain, reserving 1/2 cup pasta water.</li>
+            <li><input type="checkbox">Heat olive oil in a large skillet over medium heat, add garlic slices, and cook until lightly golden (about 2-3 minutes).</li>
+            <li><input type="checkbox">Stir in red pepper flakes and cook for 30 seconds.</li>
+            <li><input type="checkbox">Add cooked spaghetti to the skillet, tossing to coat in the oil mixture; add reserved pasta water if needed for consistency.</li>
+            <li><input type="checkbox">Season with salt, sprinkle with parsley, and serve warm.</li>
+        </ul>
+        <p><strong>Tips:</strong> Add a sprinkle of Parmesan for extra flavor.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="spaghetti-aglio-e-olio"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'spaghetti-aglio-e-olio')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('spaghetti-aglio-e-olio')">♥</button>
+</div>        
+         <div class="recipe" data-id="veggie-stir-fry" data-tags="vegetarian, quick">
+    <img src="img/Vsf.jpg" alt="Veggie Stir-Fry">
+    <div class="recipe-content">
+        <h3>Veggie Stir-Fry</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="2" data-nutrition='{
+            "bell pepper": {"calories": 25},
+            "broccoli": {"calories": 35},
+            "carrot": {"calories": 25},
+            "soy sauce": {"calories": 20},
+            "sesame oil": {"calories": 120},
+            "ginger": {"calories": 2},
+            "garlic": {"calories": 10}
+        }'>
+            <li data-amount="1">1 bell pepper (sliced)</li>
+            <li data-amount="1">1 cup broccoli florets</li>
+            <li data-amount="1">1 carrot (sliced)</li>
+            <li data-amount="2">2 tbsp soy sauce</li>
+            <li data-amount="1">1 tbsp sesame oil</li>
+            <li data-amount="1">1 tsp ginger (grated)</li>
+            <li data-amount="2">2 garlic cloves (minced)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('veggie-stir-fry', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">2</span></p>
+            <button onclick="adjustServings('veggie-stir-fry', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">119</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 15 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat sesame oil in a large wok or skillet over medium-high heat.</li>
+            <li><input type="checkbox">Add garlic and ginger, sautéing for 30 seconds until aromatic.</li>
+            <li><input type="checkbox">Toss in broccoli, bell pepper, and carrot, stir-frying for 5-7 minutes until tender-crisp.</li>
+            <li><input type="checkbox">Pour in soy sauce, stirring to coat the vegetables evenly.</li>
+            <li><input type="checkbox">Remove from heat and serve over rice or noodles.</li>
+        </ul>
+        <p><strong>Tips:</strong> Swap soy sauce for tamari for a gluten-free option.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="veggie-stir-fry"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'veggie-stir-fry')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('veggie-stir-fry')">♥</button>
+</div>
+        <div class="recipe" data-id="cheese-quesadilla" data-tags="vegetarian, quick">
+    <img src="img/Cq.jpg" alt="Cheese Quesadilla">
+    <div class="recipe-content">
+        <h3>Cheese Quesadilla</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="1" data-nutrition='{
+            "flour tortillas": {"calories": 300},
+            "cheddar cheese": {"calories": 400},
+            "butter": {"calories": 100}
+        }'>
+            <li data-amount="2">2 flour tortillas</li>
+            <li data-amount="1">1 cup shredded cheddar cheese</li>
+            <li data-amount="1">1 tbsp butter</li>
+            <li>Salsa (optional)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('cheese-quesadilla', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">1</span></p>
+            <button onclick="adjustServings('cheese-quesadilla', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">800</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 10 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat a skillet over medium heat and melt 1/2 tbsp butter.</li>
+            <li><input type="checkbox">Place one tortilla in the skillet and sprinkle cheese evenly over it.</li>
+            <li><input type="checkbox">Top with the second tortilla and cook for 2-3 minutes until the bottom is golden.</li>
+            <li><input type="checkbox">Flip carefully, adding remaining butter if needed, and cook for another 2-3 minutes.</li>
+            <li><input type="checkbox">Slice into wedges and serve with salsa if desired.</li>
+        </ul>
+        <p><strong>Tips:</strong> Add cooked chicken or veggies for variety.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="cheese-quesadilla"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'cheese-quesadilla')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('cheese-quesadilla')">♥</button>
+</div>
+      <div class="recipe" data-id="tomato-soup" data-tags="vegetarian">
+    <img src="img/Ts.jpg" alt="Tomato Soup">
+    <div class="recipe-content">
+        <h3>Tomato Soup</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "crushed tomatoes": {"calories": 200},
+            "vegetable broth": {"calories": 20},
+            "cream": {"calories": 400},
+            "onion": {"calories": 40},
+            "garlic": {"calories": 10},
+            "olive oil": {"calories": 120}
+        }'>
+            <li data-amount="1">1 can (28 oz) crushed tomatoes</li>
+            <li data-amount="1">1 cup vegetable broth</li>
+            <li data-amount="0.5">1/2 cup cream</li>
+            <li data-amount="1">1 onion (chopped)</li>
+            <li data-amount="2">2 garlic cloves (minced)</li>
+            <li data-amount="1">1 tbsp olive oil</li>
+            <li>Salt</li>
+            <li>Pepper</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('tomato-soup', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('tomato-soup', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">198</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 30 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat olive oil in a pot over medium heat, add onion, and cook until soft (about 5 minutes).</li>
+            <li><input type="checkbox">Add garlic and cook for 1 minute.</li>
+            <li><input type="checkbox">Stir in crushed tomatoes and vegetable broth, bringing to a simmer.</li>
+            <li><input type="checkbox">Cook for 15 minutes, then blend until smooth using an immersion blender.</li>
+            <li><input type="checkbox">Stir in cream, season with salt and pepper, and serve warm.</li>
+        </ul>
+        <p><strong>Tips:</strong> Pair with grilled cheese for a classic combo.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="tomato-soup"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'tomato-soup')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('tomato-soup')">♥</button>
+</div>
+<div class="recipe" data-id="egg-fried-rice" data-tags="vegetarian, quick">
+    <img src="img/Efr.jpg" alt="Egg Fried Rice">
+    <div class="recipe-content">
+        <h3>Egg Fried Rice</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="2" data-nutrition='{
+            "rice": {"calories": 400},
+            "eggs": {"calories": 140},
+            "soy sauce": {"calories": 60},
+            "peas": {"calories": 40},
+            "carrot": {"calories": 25},
+            "oil": {"calories": 240},
+            "green onions": {"calories": 10}
+        }'>
+            <li data-amount="2">2 cups day old rice (cooled)</li>
+            <li data-amount="2">2 eggs (beaten)</li>
+            <li data-amount="0.25">1/4 cup soy sauce</li>
+            <li data-amount="0.5">1/2 cup peas</li>
+            <li data-amount="1">1 carrot (diced)</li>
+            <li data-amount="2">2 tbsp oil</li>
+            <li data-amount="2">2 green onions (chopped)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('egg-fried-rice', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">2</span></p>
+            <button onclick="adjustServings('egg-fried-rice', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">458</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 20 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Vegetarian</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat 1 tbsp oil in a large skillet over medium heat, add beaten eggs, and scramble until fully cooked; remove and set aside.</li>
+            <li><input type="checkbox">Add remaining oil, then stir-fry peas and carrot for 3-4 minutes.</li>
+            <li><input type="checkbox">Add rice, breaking up clumps, and stir-fry for 5 minutes.</li>
+            <li><input type="checkbox">Pour in soy sauce, mix in scrambled eggs, and cook for 2 more minutes.</li>
+            <li><input type="checkbox">Garnish with green onions and serve.</li>
+        </ul>
+        <p><strong>Tips:</strong> Use day-old rice for best texture.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="egg-fried-rice"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'egg-fried-rice')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('egg-fried-rice')">♥</button>
+</div>      
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Sweet Recipes -->
+    <section id="sweets" class="recipe-section" role="tabpanel">
+<div class="recipe" data-id="kunefe" data-tags="dessert, turkish">
+    <img src="img/Kunefe.jpg" alt="Künefe">
+    <div class="recipe-content">
+        <h3>Künefe (Sweet Cheese Pastry)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="6" data-nutrition='{
+            "shredded phyllo dough": {"calories": 750},
+            "unsalted cheese": {"calories": 600},
+            "butter": {"calories": 400},
+            "sugar": {"calories": 768},
+            "pistachios": {"calories": 80}
+        }'>
+            <li data-amount="0.5">1/2 lb shredded phyllo dough (kadayif)</li>
+            <li data-amount="0.5">1/2 lb unsalted cheese (like mozzarella or Turkish string cheese)</li>
+            <li data-amount="0.5">1/2 cup butter (melted)</li>
+            <li data-amount="1">1 cup sugar</li>
+            <li data-amount="0.75">3/4 cup water</li>
+            <li data-amount="1">1 tsp lemon juice</li>
+            <li data-amount="2">2 tbsp pistachios (ground, for garnish)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('kunefe', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">6</span></p>
+            <button onclick="adjustServings('kunefe', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">433</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 45 minutes</p>
+        <p><strong>Difficulty:</strong> Medium</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 375°F (190°C).</li>
+            <li><input type="checkbox">Grease a round baking dish and layer half the shredded phyllo, pressing it down.</li>
+            <li><input type="checkbox">Spread cheese evenly over the phyllo, then cover with the remaining phyllo, pressing gently.</li>
+            <li><input type="checkbox">Pour melted butter over the top and bake for 30-35 minutes until golden.</li>
+            <li><input type="checkbox">Meanwhile, boil sugar, water, and lemon juice for 10 minutes to make syrup, then let it cool slightly.</li>
+            <li><input type="checkbox">Pour warm syrup over hot künefe, sprinkle with pistachios, and serve immediately.</li>
+        </ul>
+        <p><strong>Tips:</strong> Serve fresh and hot for the best gooey cheese texture.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="kunefe"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'kunefe')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('kunefe')">♥</button>
+
+</div>
+       <div class="recipe" data-id="sutlac" data-tags="dessert, turkish">
+    <img src="img/S.jpg" alt="Sütlaç">
+    <div class="recipe-content">
+        <h3>Sütlaç (Turkish Rice Pudding)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "short-grain rice": {"calories": 360},
+            "milk": {"calories": 480},
+            "sugar": {"calories": 576},
+            "cornstarch": {"calories": 30},
+            "vanilla extract": {"calories": 12}
+        }'>
+            <li data-amount="0.5">1/2 cup short-grain rice</li>
+            <li data-amount="4">4 cups milk</li>
+            <li data-amount="0.75">3/4 cup sugar</li>
+            <li data-amount="1">1 tbsp cornstarch</li>
+            <li data-amount="1">1 tsp vanilla extract</li>
+            <li data-amount="1">1 tbsp cinnamon (for dusting)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('sutlac', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('sutlac', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">365</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 1 hour (including chilling)</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Turkish</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Rinse rice and cook in 1 cup water until water is absorbed, about 10 minutes.</li>
+            <li><input type="checkbox">Add 3 1/2 cups milk and simmer over low heat, stirring occasionally, for 20 minutes.</li>
+            <li><input type="checkbox">Mix cornstarch with remaining 1/2 cup milk, then stir into the pot along with sugar.</li>
+            <li><input type="checkbox">Cook for another 10 minutes until thickened, then stir in vanilla.</li>
+            <li><input type="checkbox">Pour into bowls, cool slightly, then chill in the refrigerator for at least 30 minutes.</li>
+            <li><input type="checkbox">Dust with cinnamon before serving.</li>
+        </ul>
+        <p><strong>Tips:</strong> For a baked version, pour into oven-safe dishes, bake at 400°F (200°C) for 10-15 minutes until browned on top, then chill.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="sutlac"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'sutlac')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('sutlac')">♥</button>
+</div>
+        <div class="recipe" data-id="baklava" data-tags="dessert, baked">
+    <img src="img/B.jpg" alt="Baklava">
+    <div class="recipe-content">
+        <h3>Baklava</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="12" data-nutrition='{
+            "phyllo dough": {"calories": 1200},
+            "butter": {"calories": 800},
+            "walnuts or pistachios": {"calories": 1300},
+            "sugar": {"calories": 768},
+            "honey": {"calories": 512}
+        }'>
+            <li data-amount="1">1 package phyllo dough (16 oz)</li>
+            <li data-amount="1">1 cup butter (melted)</li>
+            <li data-amount="2">2 cups walnuts or pistachios (chopped)</li>
+            <li data-amount="1">1 cup sugar</li>
+            <li data-amount="1">1 cup water</li>
+            <li data-amount="0.5">1/2 cup honey</li>
+            <li data-amount="1">1 tsp lemon juice</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('baklava', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">12</span> pieces</p>
+            <button onclick="adjustServings('baklava', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">382</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 1 hour</p>
+        <p><strong>Difficulty:</strong> Medium</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 350°F (175°C).</li>
+            <li><input type="checkbox">Layer half the phyllo sheets in a greased 9x13-inch pan, brushing each with butter.</li>
+            <li><input type="checkbox">Sprinkle nuts evenly over the top.</li>
+            <li><input type="checkbox">Layer remaining phyllo sheets, brushing with butter, and cut into diamonds.</li>
+            <li><input type="checkbox">Bake for 45-50 minutes until golden.</li>
+            <li><input type="checkbox">Boil sugar, water, honey, and lemon juice for 10 minutes, then pour over hot baklava. Cool before serving.</li>
+        </ul>
+        <p><strong>Tips:</strong> Let it sit overnight for best flavor.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="baklava"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'baklava')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('baklava')">♥</button>
+</div>
+<div class="recipe" data-id="turkish-delight" data-tags="dessert, no-bake">
+    <img src="img/Td.jpg" alt="Turkish Delight">
+    <div class="recipe-content">
+        <h3>Turkish Delight (Lokum)</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="20" data-nutrition='{
+            "sugar": {"calories": 3072},
+            "cornstarch": {"calories": 360},
+            "rosewater": {"calories": 20},
+            "powdered sugar": {"calories": 200}
+        }'>
+            <li data-amount="4">4 cups sugar</li>
+            <li data-amount="1.5">1 1/2 cups water</li>
+            <li data-amount="1">1 tsp lemon juice</li>
+            <li data-amount="1">1 cup cornstarch</li>
+            <li data-amount="1">1 tsp cream of tartar</li>
+            <li data-amount="1">1 tbsp rosewater</li>
+            <li data-amount="0.5">1/2 cup powdered sugar (for dusting)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('turkish-delight', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">20</span> pieces</p>
+            <button onclick="adjustServings('turkish-delight', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">183</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 2 hours (including setting)</p>
+        <p><strong>Difficulty:</strong> Medium</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>No-Bake</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Boil sugar, 1/2 cup water, and lemon juice until it reaches 240°F (115°C) on a candy thermometer.</li>
+            <li><input type="checkbox">In another pot, mix cornstarch, cream of tartar, and 1 cup water; cook until thick.</li>
+            <li><input type="checkbox">Slowly pour sugar syrup into cornstarch mixture, stirring constantly.</li>
+            <li><input type="checkbox">Simmer for 1 hour, stirring often, then add rosewater.</li>
+            <li><input type="checkbox">Pour into a greased pan, let set overnight, then cut into squares and dust with powdered sugar.</li>
+        </ul>
+        <p><strong>Tips:</strong> Add chopped nuts or food coloring for variety.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="turkish-delight"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'turkish-delight')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('turkish-delight')">♥</button>
+</div>        
+       <div class="recipe" data-id="sheer-khurma" data-tags="dessert">
+    <img src="img/Sk.jpg" alt="Sheer Khurma">
+    <div class="recipe-content">
+        <h3>Sheer Khurma</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="6" data-nutrition='{
+            "vermicelli": {"calories": 200},
+            "milk": {"calories": 480},
+            "sugar": {"calories": 384},
+            "ghee": {"calories": 224},
+            "dates": {"calories": 120},
+            "almonds": {"calories": 160},
+            "pistachios": {"calories": 160},
+            "cardamom powder": {"calories": 6}
+        }'>
+            <li data-amount="0.25">1/4 cup vermicelli (seviyan)</li>
+            <li data-amount="4">4 cups milk</li>
+            <li data-amount="0.5">1/2 cup sugar</li>
+            <li data-amount="2">2 tbsp ghee</li>
+            <li data-amount="6">6 dates (pitted and chopped)</li>
+            <li data-amount="0.25">1/4 cup almonds (sliced)</li>
+            <li data-amount="0.25">1/4 cup pistachios (chopped)</li>
+            <li data-amount="1">1 tsp cardamom powder</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('sheer-khurma', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">6</span></p>
+            <button onclick="adjustServings('sheer-khurma', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">289</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 30 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Heat ghee in a pot over medium heat, add vermicelli, and roast until golden brown, about 2-3 minutes.</li>
+            <li><input type="checkbox">Pour in milk and bring to a boil, stirring occasionally.</li>
+            <li><input type="checkbox">Add chopped dates, almonds, and pistachios; simmer for 10-15 minutes until vermicelli softens.</li>
+            <li><input type="checkbox">Stir in sugar and cardamom powder, cooking until sugar dissolves and mixture thickens slightly, about 5 minutes.</li>
+            <li><input type="checkbox">Remove from heat and let cool slightly before serving warm.</li>
+        </ul>
+        <p><strong>Tips:</strong> Adjust sugar to taste and serve chilled if preferred.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="sheer-khurmas"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'sheer-khurma')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('sheer-khurma')">♥</button>
+</div>
+       <div class="recipe" data-id="chocolate-chip-cookies" data-tags="dessert, baked">
+    <img src="img/Ccc.jpg" alt="Chocolate Chip Cookies">
+    <div class="recipe-content">
+        <h3>Chocolate Chip Cookies</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="24" data-nutrition='{
+            "butter": {"calories": 800},
+            "sugar": {"calories": 576},
+            "brown sugar": {"calories": 576},
+            "eggs": {"calories": 140},
+            "flour": {"calories": 800},
+            "baking soda": {"calories": 0},
+            "chocolate chips": {"calories": 1120}
+        }'>
+            <li data-amount="1">1 cup butter (softened)</li>
+            <li data-amount="0.75">3/4 cup sugar</li>
+            <li data-amount="0.75">3/4 cup brown sugar</li>
+            <li data-amount="2">2 eggs</li>
+            <li data-amount="2">2 cups flour</li>
+            <li data-amount="1">1 tsp baking soda</li>
+            <li data-amount="0.5">1/2 tsp salt</li>
+            <li data-amount="2">2 cups chocolate chips</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('chocolate-chip-cookies', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">24</span> cookies</p>
+            <button onclick="adjustServings('chocolate-chip-cookies', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">169</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 30 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 375°F and line a baking sheet with parchment paper.</li>
+            <li><input type="checkbox">In a large bowl, cream together butter, sugar, and brown sugar until light and fluffy.</li>
+            <li><input type="checkbox">Beat in eggs one at a time, then stir in flour, baking soda, and salt until just combined.</li>
+            <li><input type="checkbox">Fold in chocolate chips evenly.</li>
+            <li><input type="checkbox">Scoop tablespoon-sized dough balls onto the baking sheet, spacing 2 inches apart.</li>
+            <li><input type="checkbox">Bake for 10-12 minutes until edges are golden. Cool on a wire rack.</li>
+        </ul>
+        <p><strong>Tips:</strong> Store in an airtight container to keep them soft.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="chocolate-chip-cookies"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'chocolate-chip-cookies')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('chocolate-chip-cookies')">♥</button>
+</div>
+<div class="recipe" data-id="fruit-smoothie" data-tags="dessert, quick">
+    <img src="img/Fs.jpg" alt="Fruit Smoothie">
+    <div class="recipe-content">
+        <h3>Fruit Smoothie</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="2" data-nutrition='{
+            "banana": {"calories": 90},
+            "strawberries": {"calories": 50},
+            "yogurt": {"calories": 75},
+            "milk": {"calories": 120},
+            "honey": {"calories": 60}
+        }'>
+            <li data-amount="1">1 banana</li>
+            <li data-amount="1">1 cup strawberries (fresh or frozen)</li>
+            <li data-amount="0.5">1/2 cup plain yogurt</li>
+            <li data-amount="1">1 cup milk</li>
+            <li data-amount="1">1 tbsp honey</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('fruit-smoothie', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">2</span></p>
+            <button onclick="adjustServings('fruit-smoothie', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">198</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 5 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Peel banana and break into chunks.</li>
+            <li><input type="checkbox">Add banana, strawberries, yogurt, milk, and honey to a blender.</li>
+            <li><input type="checkbox">Blend on high speed for 1-2 minutes until smooth and creamy.</li>
+            <li><input type="checkbox">Taste and adjust sweetness with more honey if needed.</li>
+            <li><input type="checkbox">Pour into glasses and serve chilled.</li>
+        </ul>
+        <p><strong>Tips:</strong> Freeze the banana for a thicker texture.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="fruit-smoothie"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'fruit-smoothie')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('fruit-smoothie')">♥</button>
+</div>
+       <div class="recipe" data-id="banana-bread" data-tags="dessert, baked">
+    <img src="img/Bb.jpeg" alt="Banana Bread">
+    <div class="recipe-content">
+        <h3>Banana Bread</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="8" data-nutrition='{
+            "bananas": {"calories": 270},
+            "butter": {"calories": 267},
+            "sugar": {"calories": 576},
+            "egg": {"calories": 70},
+            "vanilla": {"calories": 12},
+            "flour": {"calories": 600}
+        }'>
+            <li data-amount="3">3 ripe bananas (mashed)</li>
+            <li data-amount="0.33">1/3 cup melted butter</li>
+            <li data-amount="0.75">3/4 cup sugar</li>
+            <li data-amount="1">1 egg</li>
+            <li data-amount="1">1 tsp vanilla</li>
+            <li data-amount="1">1 tsp baking soda</li>
+            <li data-amount="1.5">1 1/2 cups flour</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('banana-bread', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">8</span> slices</p>
+            <button onclick="adjustServings('banana-bread', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">224</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 1 hour 10 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 350°F and grease a 9x5-inch loaf pan.</li>
+            <li><input type="checkbox">In a bowl, mix mashed bananas with melted butter.</li>
+            <li><input type="checkbox">Stir in sugar, egg, and vanilla until well combined.</li>
+            <li><input type="checkbox">Sprinkle baking soda over the mixture, then gently fold in flour.</li>
+            <li><input type="checkbox">Pour batter into the pan and bake for 50-60 minutes until a toothpick comes out clean.</li>
+            <li><input type="checkbox">Cool before slicing.</li>
+        </ul>
+        <p><strong>Tips:</strong> Add walnuts or chocolate chips for extra texture.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="banana-bread"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'banana-bread')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('banana-bread')">♥</button>
+</div>
+     <div class="recipe" data-id="peanut-butter-balls" data-tags="dessert, no-bake">
+    <img src="img/Pbb.jpg" alt="Peanut Butter Balls">
+    <div class="recipe-content">
+        <h3>Peanut Butter Balls</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="20" data-nutrition='{
+            "peanut butter": {"calories": 960},
+            "powdered sugar": {"calories": 200},
+            "chocolate chips": {"calories": 560}
+        }'>
+            <li data-amount="1">1 cup peanut butter</li>
+            <li data-amount="0.5">1/2 cup powdered sugar</li>
+            <li data-amount="1">1 cup chocolate chips (melted)</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('peanut-butter-balls', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">20</span> balls</p>
+            <button onclick="adjustServings('peanut-butter-balls', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">86</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 1 hour 45 minutes (including chilling)</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>No-Bake</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">In a bowl, mix peanut butter and powdered sugar until smooth.</li>
+            <li><input type="checkbox">Roll mixture into 1-inch balls and place on a parchment-lined tray.</li>
+            <li><input type="checkbox">Chill in the refrigerator for 30 minutes.</li>
+            <li><input type="checkbox">Melt chocolate chips in a microwave-safe bowl, stirring every 30 seconds.</li>
+            <li><input type="checkbox">Dip chilled balls into melted chocolate, then return to tray.</li>
+            <li><input type="checkbox">Refrigerate until chocolate sets, about 1 hour.</li>
+        </ul>
+        <p><strong>Tips:</strong> Use dark chocolate for a richer taste.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="peanut-butter-balls"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'peanut-butter-balls')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('peanut-butter-balls')">♥</button>
+</div>
+      <div class="recipe" data-id="lemon-bars" data-tags="dessert, baked">
+    <img src="img/Lb.jpg" alt="Lemon Bars">
+    <div class="recipe-content">
+        <h3>Lemon Bars</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="9" data-nutrition='{
+            "flour": {"calories": 400},
+            "butter": {"calories": 400},
+            "powdered sugar": {"calories": 100},
+            "eggs": {"calories": 140},
+            "sugar": {"calories": 768},
+            "lemon juice": {"calories": 20}
+        }'>
+            <li data-amount="1">1 cup flour</li>
+            <li data-amount="0.5">1/2 cup butter (softened)</li>
+            <li data-amount="0.25">1/4 cup powdered sugar</li>
+            <li data-amount="2">2 eggs</li>
+            <li data-amount="1">1 cup sugar</li>
+            <li data-amount="0.25">1/4 cup lemon juice</li>
+            <li data-amount="0.5">1/2 tsp baking powder</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('lemon-bars', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">9</span> bars</p>
+            <button onclick="adjustServings('lemon-bars', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">208</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 45 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 350°F and grease an 8x8-inch pan.</li>
+            <li><input type="checkbox">Mix flour, butter, and powdered sugar into a crumbly dough; press into the pan.</li>
+            <li><input type="checkbox">Bake crust for 15 minutes.</li>
+            <li><input type="checkbox">Whisk eggs, sugar, lemon juice, and baking powder until smooth.</li>
+            <li><input type="checkbox">Pour over crust and bake for 20-25 minutes until set.</li>
+            <li><input type="checkbox">Cool, dust with powdered sugar, and cut into squares.</li>
+        </ul>
+        <p><strong>Tips:</strong> Chill before cutting for cleaner edges.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="lemon-bars"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'lemon-bars')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('lemon-bars')">♥</button>
+</div>
+    <div class="recipe" data-id="vanilla-pudding" data-tags="dessert">
+    <img src="img/Vp.jpg" alt="Vanilla Pudding">
+    <div class="recipe-content">
+        <h3>Vanilla Pudding</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="4" data-nutrition='{
+            "milk": {"calories": 240},
+            "sugar": {"calories": 384},
+            "cornstarch": {"calories": 90},
+            "vanilla extract": {"calories": 12},
+            "butter": {"calories": 100}
+        }'>
+            <li data-amount="2">2 cups milk</li>
+            <li data-amount="0.5">1/2 cup sugar</li>
+            <li data-amount="3">3 tbsp cornstarch</li>
+            <li data-amount="1">1 tsp vanilla extract</li>
+            <li data-amount="1">1 tbsp butter</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('vanilla-pudding', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">4</span></p>
+            <button onclick="adjustServings('vanilla-pudding', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">207</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 2 hours 15 minutes (including chilling)</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">In a saucepan, whisk milk, sugar, and cornstarch over medium heat.</li>
+            <li><input type="checkbox">Stir constantly until mixture thickens and begins to bubble (about 5-7 minutes).</li>
+            <li><input type="checkbox">Remove from heat and stir in vanilla and butter until smooth.</li>
+            <li><input type="checkbox">Pour into bowls and let cool slightly.</li>
+            <li><input type="checkbox">Chill in the refrigerator for at least 2 hours before serving.</li>
+        </ul>
+        <p><strong>Tips:</strong> Top with whipped cream or berries.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="vanilla-pudding"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'vanilla-pudding')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('vanilla-pudding')">♥</button>
+</div>
+<div class="recipe" data-id="apple-crisp" data-tags="dessert, baked">
+    <img src="img/Ac.jpg" alt="Apple Crisp">
+    <div class="recipe-content">
+        <h3>Apple Crisp</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="6" data-nutrition='{
+            "apples": {"calories": 240},
+            "oats": {"calories": 150},
+            "flour": {"calories": 200},
+            "brown sugar": {"calories": 384},
+            "butter": {"calories": 200},
+            "cinnamon": {"calories": 6}
+        }'>
+            <li data-amount="4">4 apples (peeled, sliced)</li>
+            <li data-amount="0.5">1/2 cup oats</li>
+            <li data-amount="0.5">1/2 cup flour</li>
+            <li data-amount="0.5">1/2 cup brown sugar</li>
+            <li data-amount="0.25">1/4 cup butter</li>
+            <li data-amount="1">1 tsp cinnamon</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('apple-crisp', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">6</span></p>
+            <button onclick="adjustServings('apple-crisp', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">197</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 45 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Baked</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">Preheat oven to 375°F and place apple slices in a greased 8x8-inch dish.</li>
+            <li><input type="checkbox">Mix oats, flour, brown sugar, and cinnamon in a bowl.</li>
+            <li><input type="checkbox">Cut in butter until mixture is crumbly.</li>
+            <li><input type="checkbox">Sprinkle topping over apples evenly.</li>
+            <li><input type="checkbox">Bake for 30-35 minutes until apples are tender and topping is golden.</li>
+        </ul>
+        <p><strong>Tips:</strong> Serve warm with vanilla ice cream.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="apple-crisp"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'apple-crisp')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('apple-crisp')">♥</button>
+</div>
+       <div class="recipe" data-id="berry-parfait" data-tags="dessert, quick">
+    <img src="img/Bp.jpg" alt="Berry Parfait">
+    <div class="recipe-content">
+        <h3>Berry Parfait</h3>
+        <p><strong>Ingredients:</strong></p>
+        <ul class="ingredients" data-base-servings="2" data-nutrition='{
+            "yogurt": {"calories": 150},
+            "mixed berries": {"calories": 70},
+            "granola": {"calories": 200},
+            "honey": {"calories": 60}
+        }'>
+            <li data-amount="1">1 cup yogurt</li>
+            <li data-amount="1">1 cup mixed berries (strawberries, blueberries)</li>
+            <li data-amount="0.5">1/2 cup granola</li>
+            <li data-amount="1">1 tbsp honey</li>
+        </ul>
+        <div class="serving-adjuster">
+            <button onclick="adjustServings('berry-parfait', -1)">-</button>
+            <p><strong>Servings:</strong> <span class="serving-size">2</span></p>
+            <button onclick="adjustServings('berry-parfait', 1)">+</button>
+        </div>
+        <div class="nutrition-info">
+            <p><strong>Nutrition (per serving):</strong> <span class="calories">240</span> kcal</p>
+        </div>
+        <p><strong>Time:</strong> 10 minutes</p>
+        <p><strong>Difficulty:</strong> Easy</p>
+        <p class="tags"><strong>Tags:</strong> <span>Dessert</span><span>Quick</span></p>
+        <p><strong>Instructions:</strong></p>
+        <ul class="instruction-list">
+            <li><input type="checkbox">In a glass or bowl, layer 1/3 of the yogurt.</li>
+            <li><input type="checkbox">Add a layer of berries, followed by a sprinkle of granola.</li>
+            <li><input type="checkbox">Repeat layers until all ingredients are used.</li>
+            <li><input type="checkbox">Drizzle honey over the top.</li>
+            <li><input type="checkbox">Serve immediately or chill for later.</li>
+        </ul>
+        <p><strong>Tips:</strong> Use Greek yogurt for a creamier texture.</p>
+<div class="comments-section">
+            <h4>Comments</h4>
+            <div class="comments-list" data-id="berry-parfait"></div>
+            <form class="comment-form" onsubmit="addComment(event, 'berry-parfait')">
+                <textarea name="comment" placeholder="Add your comment..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
+    </div>
+    <button class="favorite-btn" onclick="toggleFavorite('berry-parfait')">♥</button>
+</div>
+    </section>
+
+    <!-- Favorites Section -->
+    <section id="favorites" class="recipe-section" role="tabpanel">
+        <h2>Your Favorite Recipes</h2>
+        <div id="favorites-container">
+            <p>No favorite recipes yet. Click the heart on a recipe to add it here!</p>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="about-section" role="tabpanel">
+        <h2>About Us</h2>
+        <p>Hi, I'm Kyler Nguyen, the creator of Easy Cooking Recipes. I’m passionate about making cooking accessible and fun for everyone. Here, you’ll find simple recipes that anyone can whip up in no time. Whether you're a beginner or just looking for quick meal ideas, I’ve got you covered. Feel free to reach out at <a href="mailto:kyler.nguyen206@education.nsw.gov.au">kyler.nguyen206@education.nsw.gov.au </a> or 0402440186  with any questions or suggestions. And also shout out to Edward Ly and Mahmood Haq for helping me build this website!</p>
+    </section>
+
+    <button id="back-to-top" onclick="scrollToTop()">Back to Top</button>
+
+
+    <script>
+        // Replace everything inside <script> with this
+
+        // Load comments and favorites when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            favorites.forEach(recipeId => {
+                const btn = document.querySelector(`[data-id="${recipeId}"] .favorite-btn`);
+                if (btn) btn.classList.add('favorited');
+            });
+
+            // Load comments and initialize servings for all recipes
+            document.querySelectorAll('.recipe').forEach(recipe => {
+                const recipeId = recipe.getAttribute('data-id');
+                loadComments(recipeId);
+                adjustServings(recipeId, 0);
+            });
+        });
+
+        function showTab(tabName) {
+            document.querySelectorAll('.recipe-section, .about-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+                button.setAttribute('aria-selected', 'false');
+            });
+            const activeSection = document.getElementById(tabName);
+            const activeButton = event.target;
+            activeSection.classList.add('active');
+            activeButton.classList.add('active');
+            activeButton.setAttribute('aria-selected', 'true');
+            document.getElementById('back-to-top').style.display = (tabName === 'about') ? 'none' : 'block';
+
+            if (tabName === 'favorites') {
+                updateFavorites();
+            } else {
+                searchRecipes();
+            }
+
+            // Refresh comments for visible recipes
+            activeSection.querySelectorAll('.recipe').forEach(recipe => {
+                const recipeId = recipe.getAttribute('data-id');
+                loadComments(recipeId);
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+
+        function toggleFavorite(recipeId) {
+            const btn = document.querySelector(`[data-id="${recipeId}"] .favorite-btn`);
+            const isFavorited = btn.classList.toggle('favorited');
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            if (isFavorited) {
+                if (!favorites.includes(recipeId)) favorites.push(recipeId);
+            } else {
+                favorites = favorites.filter(id => id !== recipeId);
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            if (document.getElementById('favorites').classList.contains('active')) {
+                updateFavorites();
+            }
+        }
+
+        function updateFavorites() {
+            const favoritesContainer = document.getElementById('favorites-container');
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            favoritesContainer.innerHTML = '';
+
+            if (favorites.length === 0) {
+                favoritesContainer.innerHTML = '<p>No favorite recipes yet. Click the heart on a recipe to add it here!</p>';
+                return;
+            }
+
+            const allRecipes = document.querySelectorAll('.recipe');
+            favorites.forEach(favId => {
+                const originalRecipe = Array.from(allRecipes).find(r => r.getAttribute('data-id') === favId);
+                if (originalRecipe) {
+                    const clone = originalRecipe.cloneNode(true);
+                    clone.querySelector('.favorite-btn').onclick = () => toggleFavorite(favId);
+                    clone.querySelector('.comment-form').onsubmit = (e) => addComment(e, favId);
+                    favoritesContainer.appendChild(clone);
+                    loadComments(favId);
+                }
+            });
+
+            searchRecipes();
+        }
+
+        function searchRecipes() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const activeSection = document.querySelector('.recipe-section.active');
+            if (!activeSection) return;
+
+            const recipes = activeSection.querySelectorAll('.recipe');
+            recipes.forEach(recipe => {
+                const name = recipe.querySelector('h3').textContent.toLowerCase();
+                const ingredients = Array.from(recipe.querySelectorAll('.ingredients li')).map(li => li.textContent.toLowerCase()).join(' ');
+                const tags = recipe.getAttribute('data-tags').toLowerCase();
+                const matches = name.includes(query) || ingredients.includes(query) || tags.includes(query);
+                recipe.classList.toggle('hidden', !matches);
+            });
+        }
+
+        function adjustServings(recipeId, change) {
+            const recipe = document.querySelector(`[data-id="${recipeId}"]`);
+            const servingSizeEl = recipe.querySelector('.serving-size');
+            const ingredientsList = recipe.querySelector('.ingredients');
+            const baseServings = parseInt(ingredientsList.getAttribute('data-base-servings'));
+            let currentServings = parseInt(servingSizeEl.textContent);
+
+            currentServings = Math.max(1, currentServings + change);
+            servingSizeEl.textContent = currentServings;
+
+            const ratio = currentServings / baseServings;
+            const ingredients = ingredientsList.querySelectorAll('li[data-amount]');
+            ingredients.forEach(item => {
+                const baseAmount = parseFloat(item.getAttribute('data-amount'));
+                const unitMatch = item.textContent.match(/(\d*\.?\d+)(.*)/);
+                if (unitMatch) {
+                    const newAmount = (baseAmount * ratio).toFixed(2).replace(/\.00$/, '');
+                    item.textContent = `${newAmount}${unitMatch[2]}`;
+                }
+            });
+
+            const nutritionData = JSON.parse(ingredientsList.getAttribute('data-nutrition') || '{}');
+            let totalCalories = 0;
+            for (let ingredient in nutritionData) {
+                const baseAmount = parseFloat(
+                    Array.from(ingredients).find(li => li.textContent.toLowerCase().includes(ingredient.toLowerCase()))
+                        ?.getAttribute('data-amount') || 0
+                );
+                totalCalories += (nutritionData[ingredient].calories * baseAmount);
+            }
+            const caloriesPerServing = Math.round((totalCalories / baseServings) * ratio);
+            recipe.querySelector('.calories').textContent = caloriesPerServing;
+
+            if (document.getElementById('favorites').classList.contains('active')) {
+                updateFavorites();
+            }
+        }
+
+        // Comment Functions
+        function addComment(event, recipeId) {
+            event.preventDefault();
+            const form = event.target;
+            const commentText = form.querySelector('textarea').value.trim();
+            if (!commentText) return;
+
+            const comments = JSON.parse(localStorage.getItem(`comments-${recipeId}`) || '[]');
+            const newComment = {
+                text: commentText,
+                timestamp: new Date().toLocaleString(),
+            };
+            comments.push(newComment);
+            localStorage.setItem(`comments-${recipeId}`, JSON.stringify(comments));
+
+            form.reset();
+            loadComments(recipeId);
+
+            if (document.getElementById('favorites').classList.contains('active')) {
+                updateFavorites();
+            }
+        }
+
+        function loadComments(recipeId) {
+            const commentsList = document.querySelector(`.comments-list[data-id="${recipeId}"]`);
+            if (!commentsList) return;
+
+            const comments = JSON.parse(localStorage.getItem(`comments-${recipeId}`) || '[]');
+            commentsList.innerHTML = '';
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                return;
+            }
+
+            comments.forEach(comment => {
+                const commentEl = document.createElement('div');
+                commentEl.classList.add('comment');
+                commentEl.innerHTML = `
+                    <p>${comment.text}</p>
+                    <div class="timestamp">${comment.timestamp}</div>
+                `;
+                commentsList.appendChild(commentEl);
+            });
+        }
+
+        // Dark Mode Toggle Functionality
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const body = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.textContent = '☀️';
+        } else {
+            darkModeToggle.textContent = '🌙';
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.textContent = '☀️';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                darkModeToggle.textContent = '🌙';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    </script>
+</body>
+</html>
